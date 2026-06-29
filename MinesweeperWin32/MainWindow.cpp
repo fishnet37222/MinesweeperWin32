@@ -72,6 +72,22 @@ namespace
 				OffsetRect(&rcDesired, -rcDesired.left, -rcDesired.top);
 				SetWindowPos(hwnd, nullptr, 0, 0, rcDesired.right, rcDesired.bottom, SWP_NOZORDER | SWP_NOMOVE);
 
+				RECT rcWindow;
+				GetWindowRect(hwnd, &rcWindow);
+				OffsetRect(&rcWindow, -rcWindow.left, -rcWindow.top);
+
+				RECT rcWorkingArea;
+				SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkingArea, 0);
+
+				SetWindowPos(
+					hwnd,
+					nullptr,
+					rcWorkingArea.left + (rcWorkingArea.right - rcWorkingArea.left - rcWindow.right) / 2,
+					rcWorkingArea.top + (rcWorkingArea.bottom - rcWorkingArea.top - rcWindow.bottom) / 2,
+					0, 0,
+					SWP_NOZORDER | SWP_NOSIZE
+				);
+
 				return 0;
 			}
 
