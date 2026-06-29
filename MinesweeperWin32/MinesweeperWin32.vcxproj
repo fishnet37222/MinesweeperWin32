@@ -103,6 +103,10 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="bomb.ico" />
+    <Image Include="smile-1.ico" />
+    <Image Include="smile-2.ico" />
+    <Image Include="smile-3.ico" />
+    <Image Include="smile-4.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
