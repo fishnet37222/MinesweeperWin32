@@ -43,6 +43,24 @@ namespace
 				return 0;
 			}
 
+			case WM_COMMAND:
+			{
+				if (lParam == 0)
+				{
+					switch (LOWORD(lParam))
+					{
+						case ID_GAME_EXIT:
+						{
+							DestroyWindow(hwnd);
+
+							return 0;
+						}
+					}
+				}
+
+				return 0;
+			}
+
 			default: break;
 		}
 
