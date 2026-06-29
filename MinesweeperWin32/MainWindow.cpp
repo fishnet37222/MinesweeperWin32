@@ -77,7 +77,7 @@ HWND MainWindow_Create(const HINSTANCE appInstance)
 		g_windowStyle,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 		nullptr,
-		nullptr,
+		LoadMenu(appInstance, MAKEINTRESOURCE(IDR_MENU)),
 		appInstance,
 		nullptr
 	);
