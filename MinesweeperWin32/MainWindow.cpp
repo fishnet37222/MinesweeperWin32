@@ -7,6 +7,7 @@
 #include <optional>
 #include "resource.h"
 #include <array>
+#include "AboutDialog.h"
 
 namespace
 {
@@ -126,6 +127,13 @@ namespace
 						case ID_GAME_EXIT:
 						{
 							DestroyWindow(hwnd);
+
+							return 0;
+						}
+
+						case ID_HELP_ABOUTMINESWEEPER:
+						{
+							AboutDialog_CreateAndShow(g_mainWindowClass->hInstance, hwnd);
 
 							return 0;
 						}
