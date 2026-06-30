@@ -121,7 +121,7 @@ namespace
 			{
 				if (lParam == 0)
 				{
-					switch (LOWORD(lParam))
+					switch (LOWORD(wParam))
 					{
 						case ID_GAME_EXIT:
 						{
