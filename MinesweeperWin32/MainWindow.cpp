@@ -8,12 +8,16 @@
 #include "resource.h"
 #include <array>
 #include "AboutDialog.h"
+#include "SevenSegmentDisplay.h"
+#include <algorithm>
 
 namespace
 {
 	std::optional<WNDCLASS> g_mainWindowClass;
 	HWND g_handle = nullptr;
 	HWND g_btnNewGame = nullptr;
+	HWND g_ssdUnflaggedMines = nullptr;
+	HWND g_ssdElapsedSeconds = nullptr;
 	DWORD g_windowStyle = WS_OVERLAPPEDWINDOW & ~(WS_SIZEBOX | WS_MAXIMIZEBOX);
 	std::array<HICON, 4> g_smileIcons;
 	constexpr auto OUTER_CONTROL_SPACING = 10;
@@ -62,13 +66,24 @@ namespace
 				GetObject(iconInfo.hbmColor, sizeof(BITMAP), &bmp);
 				SetWindowPos(g_btnNewGame, nullptr, 0, 0, bmp.bmWidth + 12, bmp.bmHeight + 12, SWP_NOZORDER | SWP_NOMOVE);
 
+				g_ssdUnflaggedMines = SevenSegmentDisplay_Create(hwnd, g_mainWindowClass->hInstance);
+				g_ssdElapsedSeconds = SevenSegmentDisplay_Create(hwnd, g_mainWindowClass->hInstance);
+
 				RECT rcBtnNewGame;
 				GetWindowRect(g_btnNewGame, &rcBtnNewGame);
 				OffsetRect(&rcBtnNewGame, -rcBtnNewGame.left, -rcBtnNewGame.top);
 
+				RECT rcSsdUnflaggedMines;
+				GetWindowRect(g_ssdUnflaggedMines, &rcSsdUnflaggedMines);
+				OffsetRect(&rcSsdUnflaggedMines, -rcSsdUnflaggedMines.left, -rcSsdUnflaggedMines.top);
+
+				RECT rcSsdElapsedSeconds;
+				GetWindowRect(g_ssdElapsedSeconds, &rcSsdElapsedSeconds);
+				OffsetRect(&rcSsdElapsedSeconds, -rcSsdElapsedSeconds.left, -rcSsdElapsedSeconds.top);
+
 				RECT rcDesired{};
-				rcDesired.right = OUTER_CONTROL_SPACING + rcBtnNewGame.right + OUTER_CONTROL_SPACING;
-				rcDesired.bottom = INNER_CONTROL_SPACING + rcBtnNewGame.bottom + OUTER_CONTROL_SPACING;
+				rcDesired.right = OUTER_CONTROL_SPACING + rcSsdUnflaggedMines.right + INNER_CONTROL_SPACING + rcBtnNewGame.right + INNER_CONTROL_SPACING + rcSsdElapsedSeconds.right + OUTER_CONTROL_SPACING;
+				rcDesired.bottom = INNER_CONTROL_SPACING + std::ranges::max({ rcBtnNewGame.bottom, rcSsdElapsedSeconds.bottom, rcSsdUnflaggedMines.bottom }) + OUTER_CONTROL_SPACING;
 				AdjustWindowRect(&rcDesired, g_windowStyle, TRUE);
 				OffsetRect(&rcDesired, -rcDesired.left, -rcDesired.top);
 				SetWindowPos(hwnd, nullptr, 0, 0, rcDesired.right, rcDesired.bottom, SWP_NOZORDER | SWP_NOMOVE);
@@ -101,7 +116,19 @@ namespace
 				GetWindowRect(g_btnNewGame, &rcBtnNewGame);
 				OffsetRect(&rcBtnNewGame, -rcBtnNewGame.left, -rcBtnNewGame.top);
 
-				SetWindowPos(g_btnNewGame, nullptr, (rcClient.right - rcBtnNewGame.right) / 2, INNER_CONTROL_SPACING, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+				RECT rcSsdUnflaggedMines;
+				GetWindowRect(g_ssdUnflaggedMines, &rcSsdUnflaggedMines);
+				OffsetRect(&rcSsdUnflaggedMines, -rcSsdUnflaggedMines.left, -rcSsdUnflaggedMines.top);
+
+				RECT rcSsdElapsedSeconds;
+				GetWindowRect(g_ssdElapsedSeconds, &rcSsdElapsedSeconds);
+				OffsetRect(&rcSsdElapsedSeconds, -rcSsdElapsedSeconds.left, -rcSsdElapsedSeconds.top);
+
+				SetWindowPos(g_ssdUnflaggedMines, nullptr, OUTER_CONTROL_SPACING, INNER_CONTROL_SPACING, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+
+				SetWindowPos(g_btnNewGame, nullptr, (rcClient.right - rcBtnNewGame.right) / 2, INNER_CONTROL_SPACING + (rcSsdUnflaggedMines.bottom - rcBtnNewGame.bottom) / 2, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+
+				SetWindowPos(g_ssdElapsedSeconds, nullptr, rcClient.right - rcSsdElapsedSeconds.right - OUTER_CONTROL_SPACING, INNER_CONTROL_SPACING, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 				return 0;
 			}
