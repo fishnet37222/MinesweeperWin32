@@ -29,6 +29,7 @@ namespace
 	SIZE g_webViewSize{ .cx = 600, .cy = 300 };
 	wil::com_ptr<ICoreWebView2> g_webView;
 
+	// ReSharper disable once CppParameterMayBeConst
 	void AutoSizeButton(HWND button)
 	{
 		const auto textLength = GetWindowTextLength(button);
@@ -49,6 +50,7 @@ namespace
 		SetWindowPos(button, nullptr, 0, 0, rcDesired.right, rcDesired.bottom, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
+	// ReSharper disable once CppParameterMayBeConst
 	void AutoSizeLabel(HWND label)
 	{
 		const auto textLength = GetWindowTextLength(label);
@@ -101,6 +103,13 @@ namespace
 									std::ignore = g_webViewController
 										->get_CoreWebView2(
 											&g_webView);
+
+									wil::com_ptr<ICoreWebView2Controller2> controller2;
+									if (SUCCEEDED(g_webViewController->QueryInterface(IID_PPV_ARGS(&controller2))))
+									{
+										constexpr COREWEBVIEW2_COLOR bgColor = { .A = 255, .R = 255, .G = 255, .B = 255 }; // ARGB: opaque white
+										std::ignore = controller2->put_DefaultBackgroundColor(bgColor);
+									}
 
 									// Add NavigationStarting event handler to intercept navigation
 									std::ignore = g_webView->
@@ -174,6 +183,7 @@ namespace
 				}).Get());
 	}
 
+	// ReSharper disable once CppParameterMayBeConst
 	LRESULT CALLBACK WindowProc(HWND hwnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
 		switch (uMsg)
