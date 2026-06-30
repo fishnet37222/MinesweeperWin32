@@ -10,6 +10,7 @@
 #include "AboutDialog.h"
 #include "SevenSegmentDisplay.h"
 #include <algorithm>
+#include "Settings.h"
 
 namespace
 {
@@ -29,6 +30,11 @@ namespace
 		{
 			case WM_DESTROY:
 			{
+				RECT rcMainWindow;
+				GetWindowRect(g_handle, &rcMainWindow);
+
+				Settings_SetMainWindowPosition({ rcMainWindow.left, rcMainWindow.top });
+
 				for (const auto i : g_smileIcons)
 				{
 					DestroyIcon(i);
@@ -88,6 +94,10 @@ namespace
 				OffsetRect(&rcDesired, -rcDesired.left, -rcDesired.top);
 				SetWindowPos(hwnd, nullptr, 0, 0, rcDesired.right, rcDesired.bottom, SWP_NOZORDER | SWP_NOMOVE);
 
+				auto [x, y] = Settings_GetMainWindowPosition();
+
+				if (x == -1 && y == -1)
+				{
 				RECT rcWindow;
 				GetWindowRect(hwnd, &rcWindow);
 				OffsetRect(&rcWindow, -rcWindow.left, -rcWindow.top);
@@ -95,11 +105,14 @@ namespace
 				RECT rcWorkingArea;
 				SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkingArea, 0);
 
+					x = rcWorkingArea.left + (rcWorkingArea.right - rcWorkingArea.left - rcWindow.right) / 2;
+					y = rcWorkingArea.top + (rcWorkingArea.bottom - rcWorkingArea.top - rcWindow.bottom) / 2;
+				}
+
 				SetWindowPos(
 					hwnd,
 					nullptr,
-					rcWorkingArea.left + (rcWorkingArea.right - rcWorkingArea.left - rcWindow.right) / 2,
-					rcWorkingArea.top + (rcWorkingArea.bottom - rcWorkingArea.top - rcWindow.bottom) / 2,
+					x, y,
 					0, 0,
 					SWP_NOZORDER | SWP_NOSIZE
 				);
